@@ -18,21 +18,25 @@ EXECPOINT=""
 OUTPUT=""
 BASEDIR=""
 
-function search() {
-	for file in $(ls "$1")
+function destroy() {
+	TEMP="${1##/*/}"
+	for file in $(ls "$1" | egrep "${TEMP}.jar|\linux.jar|\javadoc.jar")
 	do
-		#current = ${1}{$file}
-		if [[ ! -d ${1}/${file} ]]; then
-			#recursion time
-			search "${1}/${file}"
+		if [[ $NOCLI == 1 ]]; then
+			OUTPUT+=" $1/$file"
+			NOCLI=0
 		else
-			#Check if an extension is present, ignoring LICENSE files and the like
-			if [[ $NOCLI == 1 ]]; then
-				NOCLI=0
-				OUTPUT+="$1/$file/$file.jar"
-			else
-				OUTPUT+=":$1/$file/$file.jar"
-			fi
+			OUTPUT+=":$1/$file"
+		fi
+	done
+}
+
+function search() {
+	destroy "${1}"
+	for subdir in $(ls "$1")
+	do
+		if [[ -d ${1}/${subdir} ]]; then
+			search "${1}/${subdir}"
 		fi
 	done
 }
@@ -81,7 +85,7 @@ do
 done
 
 if [[ $HELPFLAG == 0 ]]; then
-	if [[ $COMPILE == 1]]; then
+	if [[ $COMPILE == 1 ]]; then
 		if [[ $NOCLI == 1 ]]; then
 			echo "No Arguments Passed, no scraping :)"
 			exec javac *.java
