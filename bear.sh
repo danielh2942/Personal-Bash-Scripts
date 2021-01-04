@@ -20,7 +20,7 @@ BASEDIR=""
 
 function destroy() {
 	TEMP="${1##/*/}"
-	for file in $(ls "$1" | egrep "${TEMP}.jar|\linux.jar|\javadoc.jar")
+	for file in $(ls "$1" | egrep "*.jar")
 	do
 		if [[ $NOCLI == 1 ]]; then
 			OUTPUT+=" $1/$file"
